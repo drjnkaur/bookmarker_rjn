@@ -1,11 +1,15 @@
-document.getElementById("bookmark_form").addEventListener('submit', hello);
+document.getElementById("bookmark_form").addEventListener('submit', saveBookmark);
 
-function hello(e){
+function saveBookmark(e){
   e.preventDefault();
 
   var siteName = document.getElementById('siteName').value;
   var siteUrl = document.getElementById('siteUrl').value;
 
+
+  if(!validOrNot(siteName, siteUrl)){
+    return false;
+  }
 
   var bookmark_ob = {
     name : siteName,
@@ -29,6 +33,8 @@ function hello(e){
       localStorage.setItem('list', JSON.stringify(addmore));
     }
 
+    // document.getElementById('formname').reset();
+    window.location.replace('index.html');
 
 
 
@@ -44,32 +50,49 @@ function fetchlist(){
     var url = list_data[i].url;
 
     document.getElementById('list_results').innerHTML+="<h3>"+name+"</h3>" + "<a href='"+url+"'>visit</a>" +
-    "<button type='submit' class='btn-primary' onclick='deleteItem(\'" +url+ "\')'>delete</button><br>";
+    `<button type='submit' class='btn-primary' onclick="deleteItem('${url}')" >delete</button><br>`;
+
 
 
   }
 }
 
 
-
-function test(url){
-  alert(url);
-  fetchlist();
-}
 // deleting bookmark
 
 function deleteItem(url){
-  console.log(url+"ok");
-  var items = JSON.parse(localStorage.getItem('list'));
-  console.log(items);
-  for(var i = 0; i<items.length; i++){
-    if(url==items[i].url){
-      items.splice(i, 1);
-      console.log("delete");
-    }else{
-      console.log("work");
-    }
-  }
+   var data = JSON.parse(localStorage.getItem('list'));
+   for(var i = 0; i<data.length; i++){
+     var durl = data[i].url;
 
-  fetchlist();
+     if(url === durl){
+       data.splice(i, 1 );
+     }
+
+     localStorage.setItem('list', JSON.stringify(data));
+
+     window.location.replace('index.html');
+   }
+}
+
+// validation bookmark_form
+
+function validOrNot(name, url){
+  console.log("sggjsfdsdf");
+    if(!name || !url){
+      alert('please fill all fields.');
+      return false;
+    }
+
+  //   https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)
+    var urlR = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+
+    var regex = new RegExp(urlR);
+
+
+    if (!url.match(regex)) {
+      alert("Enter Valid Url please.");
+      return false;
+    }
+    return true;
 }
